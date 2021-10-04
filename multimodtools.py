@@ -10,6 +10,9 @@ import datetime as dt
 import numpy as np
 from dateutil.parser import parse as par
 
+# Get install directory:
+install_dir = '/'.join(__loader__.path.split('/')[:-1])+'/'
+
 # Critical constants for handling SWPC events/models/stations etc.
 models = {'2_LFM-MIX':'LFM-MIX',
           '3_WEIGEL':'Weigel',
@@ -82,7 +85,7 @@ def read_ccmcfile(filename):
         # Extract date time:
         t = ' '.join(parts[:6])
         data['time'][i] = dt.datetime.strptime(t, '%Y %m %d %H %M %S')
-
+        
         # Parse remaining values:
         for v, x in zip(['bn','be','bz'], parts[-3:]):
             data['d'*is_dBdt + v][i] = x
