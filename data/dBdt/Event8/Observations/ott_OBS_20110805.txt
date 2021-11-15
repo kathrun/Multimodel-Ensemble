@@ -5,10 +5,8 @@
 #Submission Observation
 #ModelSettingID
 #RORnumber
-Year Month Day Hour Min Sec GeomagLat GeomagLon B_NorthGeomag B_EastGeomag B_DownGeomag
-[year]  [month]  [day] [hour]  [min]  [s] [deg] [deg] [nT] [nT] [nT]
 Year Month Day Hour Min Sec GeomagLat GeomagLon dBdt_NorthGeomag dBdt_EastGeomag dBdt_DownGeomag
-[year] [month] [day] [hour] [min] [s] [deg] [deg] [nT/s]T] [nT/s]T] [nT/s]T]
+[year] [month] [day] [hour] [min] [s] [deg] [deg] [nT/s] [nT/s] [nT/s]
 2011 8 5 0 2 30     55.8000     -5.0000     -0.0133     -0.0067     -0.0067
 2011 8 5 0 3 30     55.8000     -5.0000     -0.0433     -0.0317      0.0033
 2011 8 5 0 4 30     55.8000     -5.0000      0.0017     -0.0200     -0.0083
