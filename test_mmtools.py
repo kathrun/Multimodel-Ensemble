@@ -88,7 +88,41 @@ class TestMultiModTools(unittest.TestCase):
             self.assertEqual(obs[k][ 0], self.known_obs_dt[k][ 0])
             self.assertEqual(obs[k][-1], self.known_obs_dt[k][-1])
 
+# Define test case classes to group related tests together:
+class TestBinTable(unittest.TestCase):
+    '''
+    Test creating a binary event table to match Pulkkinen 2013.
+    Reference solution found at:
+    https://ccmc.gsfc.nasa.gov/RoR_WWW/publications/Appendix_GeospaceValidation_PhaseI_dBdt.pdf
+    '''
+
+    from validator import BinaryEventTable
+
+    # Build hi-lat binary event table for dB/dt:
     
+    # Files for LFM/Event1:
+    mod_file_db = datadir + '/deltaB/Event1/2_LFM-MIX/ABK_2_LFM-MIX_Event1.txt'
+    mod_file_dt = datadir + '/dBdt/Event1/2_LFM-MIX/ABK_2_LFM-MIX_Event1.txt'
+    # Corresponding observations:
+    obs_file_db = datadir + '/deltaB/Event1/Observations/abk_OBS_20031029.txt'
+    obs_file_dt = datadir + '/dBdt/Event1/Observations/abk_OBS_20031029.txt'
+
+    # Open files and create binary event tables:
+    obs = mmt.read_ccmcfile(obs_file_dt)
+    mod = mmt.read_ccmcfile(mod_file_dt)
+    t_dt = BinaryEventTable(obs['time'], obs['dbh'], mod['time'], mod['dbh'],
+                            0.3, 20*60)
+    obs = mmt.read_ccmcfile(obs_file_db)
+    mod = mmt.read_ccmcfile(mod_file_db)
+    t_db = BinaryEventTable(obs['time'], obs['bh'], mod['time'], mod['bh'],
+                            0.3, 20*60)
+    
+    def test_dbdt(self):
+        pass
+
+    def test_db(self):
+        pass
+
 # Run all tests:    
 if __name__=='__main__':
     unittest.main()

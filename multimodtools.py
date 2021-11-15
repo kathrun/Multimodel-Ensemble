@@ -5,6 +5,7 @@ This is the top-level module for the MultiModel Ensemble study.
 It contains tools to read data files, create ensembles, etc.
 '''
 
+import os
 import datetime as dt
 
 import numpy as np
@@ -12,6 +13,9 @@ from dateutil.parser import parse as par
 
 # Get install directory:
 install_dir = '/'.join(__loader__.path.split('/')[:-1])+'/'
+
+# Get path to data directory:
+datadir = install_dir+'data/'
 
 # Critical constants for handling SWPC events/models/stations etc.
 models = {'2_LFM-MIX':'LFM-MIX',
@@ -22,6 +26,8 @@ models = {'2_LFM-MIX':'LFM-MIX',
 
 hilat = ['PBQ', 'SNK', 'ABK', 'YKC']
 lolat = ['WNG', 'NEW', 'OTT']
+
+allmag = hilat+lolat
 
 # Time limits of the events:
 tlims={1:(par('October 29th, 2003 06:00UT', ignoretz=True),
@@ -36,6 +42,10 @@ tlims={1:(par('October 29th, 2003 06:00UT', ignoretz=True),
           par('April 6, 2010, 00:00 UT',    ignoretz=True)),
        8:(par('August 5, 2011 09:00 UT',    ignoretz=True),
           par('August 6, 2011, 09:00 UT',   ignoretz=True))}
+
+# Store binary event threshold values:
+thres_dt = [0.3, 0.7, 1.1, 1.5] # nT/s
+thres_db = [101.6, 213.6, 317.5, 416.7] #nT
 
 def read_ccmcfile(filename):
     '''
@@ -96,3 +106,87 @@ def read_ccmcfile(filename):
     
     # Return data object to caller:
     return data
+
+def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
+    '''
+    Create a binary event table for *model* (must be member of *models* list)
+    that includes all magnetometers included in *mag_set* (can be "all", "hi",
+    or "lo") for all events listed in *event_set* and using a certain threshold,
+    *thresh*.
+
+    Parameters
+    ==========
+    model:str
+       What model to use when building the table.  See *models* list for options.
+
+    Other Parameters
+    ================
+    mag_set:str
+       Set which group of magnetometers to use, 'hi', 'lo', or 'all' for high
+       latitude, mid-latitude, or both.
+
+    event_set:list or 'all'
+       List of event numbers to include, e.g., [1,2,8], defaults to 'all'.
+       Available events are [1,2,3,4,7,8] following Pulkkinen et al., 2013.
+
+    thresh:float
+       Set the event threshold value; defaults to 0.3.
+
+    window:int
+       Set the interval window in minutes; defaults to 20.
+
+    Examples
+    ========
+    '''
+
+    from validator import BinaryEventTable
+    
+    # Handle mag set:
+    if mag_set=='all':
+        mag_set = allmag
+    elif 'hi' in mag_set:
+        mag_set = hilat
+    elif 'lo' in mag_set:
+        mag_set = lowlat
+    else:
+        raise ValueError(f"Unrecognized mag_set: {mag_set}")
+
+    # Handle events:
+    if event_set == 'all':
+        event_set=[1,2,3,4,7,8]
+    elif type(event_set) == int:
+        event_set = [event_set]
+    
+    # Convert window from minutes to seconds:
+    window *= 60
+    
+    for ev in event_set:
+        for mag in mag_set:
+            # Build path to model data
+            f_mod=datadir + f'/dBdt/Event{ev}/{model}/{mag.upper()}' + \
+                f'_{model}_Event{ev}.txt'
+            
+            # Build path to obs data
+            f_obs=datadir+f'/dBdt/Event{ev}/Observations/{mag.lower()}' \
+                + f'_OBS_{tlims[ev][0]:%Y%m%d}.txt'
+
+            if not os.path.exists(f_obs):
+                print(f"Warning: magnetometer {mag} not found")
+                continue
+            
+            # Open files
+            mod = read_ccmcfile(f_mod)
+            obs = read_ccmcfile(f_obs)
+            
+            # Compute table, add to existing hits/misses/etc.
+            if 'table' in locals():
+                table += BinaryEventTable(obs['time'], obs['dbh'],
+                                          mod['time'], mod['dbh'],
+                                          thresh, window, trange=tlims[ev])
+            else:
+                table = BinaryEventTable(obs['time'], obs['dbh'],
+                                         mod['time'], mod['dbh'],
+                                         thresh, window, trange=tlims[ev])
+
+    return table
+            
