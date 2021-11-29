@@ -56,7 +56,6 @@ def read_ccmcfile(filename):
     values) or dB/dt in N-E-Z coordinates, and the "H" component (tangent
     to surface) as defined in the Pulkkinen et al study.
 
-    File 
     '''
 
     # Start by opening our file:
@@ -88,12 +87,17 @@ def read_ccmcfile(filename):
     for v in ['bn','be','bz']:
         data['d'*is_dBdt + v] = np.zeros(nlines)
 
+    # CCMC introduced lots of error in the "second" column of the time
+    # entry: instead of 0 or 30, we find 30.5 or other values.  This affects
+    # analysis.  So, set seconds for time entries based on file type.
+    seconds = ' 30' if is_dBdt else ' 00'
+        
     # Loop through and parse all data lines:
     for i, l in enumerate(lines):
         parts = l.split()
 
         # Extract date time:
-        t = ' '.join(parts[:6])
+        t = ' '.join(parts[:5]) + seconds
         data['time'][i] = dt.datetime.strptime(t, '%Y %m %d %H %M %S')
         
         # Parse remaining values:
@@ -137,6 +141,18 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
 
     Examples
     ========
+    Calculate table for LFM-MIX, event 1 only, high-latitude stations only:
+    
+    >>> table = mmt.build_table('2_LFM-MIX', event_set=[1], mag_set='hi')
+
+    Calculate table for SWMF, event 1 only, low-latitude stations only, 
+    then print out values to screen:
+
+    >>> table = mmt.build_table('9_SWMF', event_set=[1], mag_set='lo')
+    >>> print(table)
+
+    199 hits, 4 misses, 6 false positives, 7 true negatives.
+
     '''
 
     from validator import BinaryEventTable
@@ -147,7 +163,7 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
     elif 'hi' in mag_set:
         mag_set = hilat
     elif 'lo' in mag_set:
-        mag_set = lowlat
+        mag_set = lolat
     else:
         raise ValueError(f"Unrecognized mag_set: {mag_set}")
 

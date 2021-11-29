@@ -99,28 +99,9 @@ class TestBinTable(unittest.TestCase):
     from validator import BinaryEventTable
 
     # Build hi-lat binary event table for dB/dt:
-    
-    # Files for LFM/Event1:
-    mod_file_db = datadir + '/deltaB/Event1/2_LFM-MIX/ABK_2_LFM-MIX_Event1.txt'
-    mod_file_dt = datadir + '/dBdt/Event1/2_LFM-MIX/ABK_2_LFM-MIX_Event1.txt'
-    # Corresponding observations:
-    obs_file_db = datadir + '/deltaB/Event1/Observations/abk_OBS_20031029.txt'
-    obs_file_dt = datadir + '/dBdt/Event1/Observations/abk_OBS_20031029.txt'
 
-    # Open files and create binary event tables:
-    obs = mmt.read_ccmcfile(obs_file_dt)
-    mod = mmt.read_ccmcfile(mod_file_dt)
-    t_dt = BinaryEventTable(obs['time'], obs['dbh'], mod['time'], mod['dbh'],
-                            0.3, 20*60)
-    obs = mmt.read_ccmcfile(obs_file_db)
-    mod = mmt.read_ccmcfile(mod_file_db)
-    t_db = BinaryEventTable(obs['time'], obs['bh'], mod['time'], mod['bh'],
-                            0.3, 20*60)
     
     def test_dbdt(self):
-        pass
-
-    def test_db(self):
         pass
 
 # Run all tests:    
