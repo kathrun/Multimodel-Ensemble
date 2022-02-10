@@ -25,18 +25,18 @@ class TestMultiModTools(unittest.TestCase):
     obs_file_dt = datadir + '/dBdt/Event1/Observations/abk_OBS_20031029.txt'
 
     # Observation values for delta-B
-    known_obs_db = {'time':[dt.datetime(2003,10,29,0,0,0),
-                            dt.datetime(2003,10,30,23,59,0)],
-                    'bn':np.array([-0264.3,-0042.8]),
-                    'be':np.array([-0160.2,-0004.2]),
-                    'bz':np.array([00043.4,00318.9])}
+    known_obs_db = {'time':[dt.datetime(2003, 10, 29, 0, 0, 0),
+                            dt.datetime(2003, 10, 30, 23,59, 0)],
+                    'bn':np.array([-0264.3, -0042.8]),
+                    'be':np.array([-0160.2, -0004.2]),
+                    'bz':np.array([00043.4, 00318.9])}
     known_obs_db['bh'] = np.sqrt(known_obs_db['bn']**2+known_obs_db['be']**2)
     # Model values for delta-B
-    known_mod_db = {'time':[dt.datetime(2003,10,29,1,0,0),
-                            dt.datetime(2003,10,30,6,0,0)],
+    known_mod_db = {'time':[dt.datetime(2003, 10, 29, 1, 0, 0),
+                            dt.datetime(2003, 10, 30, 6, 0, 0)],
                     'bn':np.array([-84.950, -26.002]),
-                    'be':np.array([14.285, 10.243]),
-                    'bz':np.array([1.490, 13.721])}
+                    'be':np.array([14.2850, 10.243]),
+                    'bz':np.array([1.49000, 13.721])}
     known_mod_db['bh'] = np.sqrt(known_mod_db['bn']**2+known_mod_db['be']**2)
 
     # Observation values for dBdt
@@ -53,40 +53,51 @@ class TestMultiModTools(unittest.TestCase):
                     'dbe':np.array([-0.0055,0.0132]),
                     'dbz':np.array([0.0200,-0.0300])}
     known_mod_dt['dbh'] = np.sqrt(known_mod_dt['dbn']**2+known_mod_dt['dbe']**2)
-    
+
     def test_read_deltaB(self):
         '''Test opening model and observation data for deltaB'''
 
         # Open files:
         obs = mmt.read_ccmcfile(self.obs_file_db)
         mod = mmt.read_ccmcfile(self.mod_file_db)
-        
+
         # Test example model file:
         for k in self.known_mod_db.keys():
             self.assertEqual(mod[k][ 0], self.known_mod_db[k][ 0])
             self.assertEqual(mod[k][-1], self.known_mod_db[k][-1])
-        
+
         # Test example observation file:
         for k in self.known_obs_db.keys():
             self.assertEqual(obs[k][ 0], self.known_obs_db[k][ 0])
             self.assertEqual(obs[k][-1], self.known_obs_db[k][-1])
-            
+
     def test_read_dBdt(self):
         '''Test opening model and observation data for dBdt'''
 
         # Open files:
         obs = mmt.read_ccmcfile(self.obs_file_dt)
         mod = mmt.read_ccmcfile(self.mod_file_dt)
-        
+
         # Test example model file:
         for k in self.known_mod_dt.keys():
             self.assertEqual(mod[k][ 0], self.known_mod_dt[k][ 0])
             self.assertEqual(mod[k][-1], self.known_mod_dt[k][-1])
-        
+
         # Test example observation file:
         for k in self.known_obs_dt.keys():
             self.assertEqual(obs[k][ 0], self.known_obs_dt[k][ 0])
             self.assertEqual(obs[k][-1], self.known_obs_dt[k][-1])
+
+    def test_read_weigel(self):
+        '''
+        Weigel files have a different format, check if we can still read.
+        '''
+
+        weigpath = datadir+'dBdt/Event1/3_WEIGEL/'
+
+        mod = mmt.read_ccmcfile(weigpath + 'ABK_3_WEIGEL_Event1.txt')
+        self.assertEqual(mod['time'][0], dt.datetime(2003, 10, 29, 0, 0, 30))
+        self.assertEqual(mod['dbn'][8], -0.057)
 
 # Define test case classes to group related tests together:
 class TestBinTable(unittest.TestCase):
@@ -100,10 +111,10 @@ class TestBinTable(unittest.TestCase):
 
     # Build hi-lat binary event table for dB/dt:
 
-    
+
     def test_dbdt(self):
         pass
 
-# Run all tests:    
+# Run all tests:
 if __name__=='__main__':
     unittest.main()

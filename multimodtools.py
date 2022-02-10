@@ -50,8 +50,8 @@ thres_db = [101.6, 213.6, 317.5, 416.7] #nT
 def read_ccmcfile(filename):
     '''
     Read and parse a single SWPC file.
-    
-    Results are returned as a dictionary containing 'time', the three 
+
+    Results are returned as a dictionary containing 'time', the three
     components of either deltaB (perturbation of field from quiet time
     values) or dB/dt in N-E-Z coordinates, and the "H" component (tangent
     to surface) as defined in the Pulkkinen et al study.
@@ -64,7 +64,7 @@ def read_ccmcfile(filename):
         # deltaB or dB/dt file.  This will be given in the variable name
         # line.
         trash = '    '
-        while trash[:4] != 'Year':
+        while 'Year' not in trash:
             trash = f.readline()
 
         # Look for dBdt in variable names to determine data type:
@@ -75,7 +75,7 @@ def read_ccmcfile(filename):
 
         # Slurp remainder of file:
         lines = f.readlines()
-        
+
     # Create output container:
     data = {}  # Empty dictionary
     nlines = len(lines)  # number of data entries
@@ -91,7 +91,7 @@ def read_ccmcfile(filename):
     # entry: instead of 0 or 30, we find 30.5 or other values.  This affects
     # analysis.  So, set seconds for time entries based on file type.
     seconds = ' 30' if is_dBdt else ' 00'
-        
+
     # Loop through and parse all data lines:
     for i, l in enumerate(lines):
         parts = l.split()
@@ -99,7 +99,7 @@ def read_ccmcfile(filename):
         # Extract date time:
         t = ' '.join(parts[:5]) + seconds
         data['time'][i] = dt.datetime.strptime(t, '%Y %m %d %H %M %S')
-        
+
         # Parse remaining values:
         for v, x in zip(['bn','be','bz'], parts[-3:]):
             data['d'*is_dBdt + v][i] = x
@@ -107,7 +107,7 @@ def read_ccmcfile(filename):
     # Calculate h component:
     data['d'*is_dBdt + 'bh'] = np.sqrt(data['d'*is_dBdt + 'bn']**2 +
                                        data['d'*is_dBdt + 'be']**2)
-    
+
     # Return data object to caller:
     return data
 
@@ -142,10 +142,10 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
     Examples
     ========
     Calculate table for LFM-MIX, event 1 only, high-latitude stations only:
-    
+
     >>> table = mmt.build_table('2_LFM-MIX', event_set=[1], mag_set='hi')
 
-    Calculate table for SWMF, event 1 only, low-latitude stations only, 
+    Calculate table for SWMF, event 1 only, low-latitude stations only,
     then print out values to screen:
 
     >>> table = mmt.build_table('9_SWMF', event_set=[1], mag_set='lo')
@@ -156,7 +156,7 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
     '''
 
     from validator import BinaryEventTable
-    
+
     # Handle mag set:
     if mag_set=='all':
         mag_set = allmag
@@ -172,16 +172,16 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
         event_set=[1,2,3,4,7,8]
     elif type(event_set) == int:
         event_set = [event_set]
-    
+
     # Convert window from minutes to seconds:
     window *= 60
-    
+
     for ev in event_set:
         for mag in mag_set:
             # Build path to model data
             f_mod=datadir + f'/dBdt/Event{ev}/{model}/{mag.upper()}' + \
                 f'_{model}_Event{ev}.txt'
-            
+
             # Build path to obs data
             f_obs=datadir+f'/dBdt/Event{ev}/Observations/{mag.lower()}' \
                 + f'_OBS_{tlims[ev][0]:%Y%m%d}.txt'
@@ -189,11 +189,11 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
             if not os.path.exists(f_obs):
                 print(f"Warning: magnetometer {mag} not found")
                 continue
-            
+
             # Open files
             mod = read_ccmcfile(f_mod)
             obs = read_ccmcfile(f_obs)
-            
+
             # Compute table, add to existing hits/misses/etc.
             if 'table' in locals():
                 table += BinaryEventTable(obs['time'], obs['dbh'],
@@ -205,4 +205,4 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
                                          thresh, window, trange=tlims[ev])
 
     return table
-            
+
