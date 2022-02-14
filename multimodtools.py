@@ -24,8 +24,8 @@ models = {'2_LFM-MIX':'LFM-MIX',
           '6_WEIMER':'Weimer2010',
           '9_SWMF':'SWMF'}
 
-hilat = ['PBQ', 'SNK', 'ABK', 'YKC']
-lolat = ['WNG', 'NEW', 'OTT']
+hilat = ['PBQ', 'SNK', 'ABK', 'YKC'] #'HRN', 'IQA', 'MEA']
+lolat = ['WNG', 'NEW', 'OTT'] #'FUR', 'FRD', 'FRN']
 
 allmag = hilat+lolat
 
