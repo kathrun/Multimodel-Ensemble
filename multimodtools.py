@@ -111,7 +111,8 @@ def read_ccmcfile(filename):
     # Return data object to caller:
     return data
 
-def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
+def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
+                window=20, debug=False):
     '''
     Create a binary event table for *model* (must be member of *models* list)
     that includes all magnetometers included in *mag_set* (can be "all", "hi",
@@ -138,6 +139,9 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
 
     window:int
        Set the interval window in minutes; defaults to 20.
+
+    debug : Boolean, default=False
+        Print extra debug info to screen.
 
     Examples
     ========
@@ -177,6 +181,13 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
     window *= 60
 
     for ev in event_set:
+        # Keep track of what magnetometers we used to build the table:
+        used_mags = []
+
+        # "Header" for debug prints:
+        if debug:
+            print(f"WORKING ON EVENT {ev}\n-------------------")
+
         for mag in mag_set:
             # Build path to model data
             f_mod=datadir + f'/dBdt/Event{ev}/{model}/{mag.upper()}' + \
@@ -186,9 +197,14 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
             f_obs=datadir+f'/dBdt/Event{ev}/Observations/{mag.lower()}' \
                 + f'_OBS_{tlims[ev][0]:%Y%m%d}.txt'
 
-            if not os.path.exists(f_obs):
+            if debug:
+                print(f'Looking for files:\n\t{f_mod}\n\t{f_obs}')
+
+            if not os.path.exists(f_obs) or not os.path.exists(f_mod):
                 print(f"Warning: magnetometer {mag} not found")
                 continue
+
+            used_mags.append(mag)
 
             # Open files
             mod = read_ccmcfile(f_mod)
@@ -203,6 +219,12 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3, window=20):
                 table = BinaryEventTable(obs['time'], obs['dbh'],
                                          mod['time'], mod['dbh'],
                                          thresh, window, trange=tlims[ev])
+
+        # Print off mags used in comparison
+        if debug:
+            print(f'Event {ev} used {len(used_mags)}:')
+            for m in used_mags:
+                print(f'\t{m}')
 
     return table
 
