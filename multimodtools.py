@@ -126,19 +126,21 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
 
     Other Parameters
     ================
-    mag_set:str
-       Set which group of magnetometers to use, 'hi', 'lo', or 'all' for high
-       latitude, mid-latitude, or both.
+    mag_set : str or list
+        Set which group of magnetometers to use. Can be a list of 3-letter
+        magnetometer station name codes or a string indicating what group to
+        use, e.g., 'hi', 'lo', or 'all' for high latitude, mid-latitude,
+        or both.
 
-    event_set:list or 'all'
-       List of event numbers to include, e.g., [1,2,8], defaults to 'all'.
-       Available events are [1,2,3,4,7,8] following Pulkkinen et al., 2013.
+    event_set : list or 'all'
+        List of event numbers to include, e.g., [1,2,8], defaults to 'all'.
+        Available events are [1,2,3,4,7,8] following Pulkkinen et al., 2013.
 
-    thresh:float
-       Set the event threshold value; defaults to 0.3.
+    thresh : float, default=0.3
+        Set the event threshold value; defaults to 0.3.
 
-    window:int
-       Set the interval window in minutes; defaults to 20.
+    window : int, default=20
+        Set the interval window in minutes; defaults to 20.
 
     debug : Boolean, default=False
         Print extra debug info to screen.
@@ -168,8 +170,6 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
         mag_set = hilat
     elif 'lo' in mag_set:
         mag_set = lolat
-    else:
-        raise ValueError(f"Unrecognized mag_set: {mag_set}")
 
     # Handle events:
     if event_set == 'all':
