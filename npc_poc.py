@@ -19,12 +19,13 @@ style()
 mag, event, thresh = 'WNG', 7, 0.3
 tab_kwargs = {'event_set':[event], 'mag_set':[mag], 'thresh':thresh}
 
-# Create tables for all 5 events.
+# Create tables for all 5 models.
 tables = {}
 for m in mmt.models:
     tables[mmt.models[m]] = mmt.build_table(m, **tab_kwargs)
 
-# Create NPC:
+# Create NPC by counting the number of crossings in each bin
+# across all ensemble members (i.e., models)
 mod = np.zeros(tables['SWMF'].obsmax.size)
 for tab in tables:
     mod += 1*tables[tab].bool
