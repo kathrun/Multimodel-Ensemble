@@ -16,7 +16,7 @@ import multimodtools as mmt
 style()
 
 # Set metric parameters:
-mag, event, thresh = 'WNG', 7, 0.3
+mag, event, thresh = 'WNG', 4, 0.3
 tab_kwargs = {'event_set':[event], 'mag_set':[mag], 'thresh':thresh}
 
 # Create tables for all 5 models.
@@ -32,7 +32,8 @@ for tab in tables:
 
 npc_forecast = 1.1 * thresh * (mod>=2)
 npc_tab = BinaryEventTable(tables['SWMF'].tObs, tables['SWMF'].Obs,
-                           tables['SWMF'].time, npc_forecast, thresh, 20*60)
+                           tables['SWMF'].time, npc_forecast, thresh,
+                           trange=mmt.tlims[event], window=20*60)
 
 # Create a cool plot:
 fig = plt.figure(figsize=(10,7))
@@ -48,7 +49,7 @@ a1.plot(tables['SWMF'].time, tables['SWMF'].obsmax, 'x', c='crimson')
 # Center fig: Bin maxes
 for m in tables:
     a2.plot(tables[m].time, tables[m].modmax, 'o', c='C0', alpha=0.5, ms=5,
-            label='Ensemble' if m is 'SWMF' else '_')
+            label='Ensemble' if m == 'SWMF' else '_')
 a2.plot(tables['SWMF'].time, tables['SWMF'].obsmax,
         'x', c='crimson', label='Obs.')
 a2.plot(tables['SWMF'].tObs, tables['SWMF'].Obs, c='crimson')
