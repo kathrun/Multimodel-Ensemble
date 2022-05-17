@@ -112,7 +112,7 @@ def read_ccmcfile(filename):
     return data
 
 def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
-                window=20, debug=False):
+                window=20, debug=False, verbose=True):
     '''
     Create a binary event table for *model* (must be member of *models* list)
     that includes all magnetometers included in *mag_set* (can be "all", "hi",
@@ -201,7 +201,8 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
                 print(f'Looking for files:\n\t{f_mod}\n\t{f_obs}')
 
             if not os.path.exists(f_obs) or not os.path.exists(f_mod):
-                print(f"Warning: magnetometer {mag} not found")
+                if verbose:
+                    print(f"Warning: magnetometer {mag} not found")
                 continue
 
             used_mags.append(mag)
