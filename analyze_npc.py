@@ -89,6 +89,11 @@ for group in ['all', 'hi', 'lo']:
         mod += 1*tables[tab].bool
     npc_forecast = 1.1 * args.threshold * (mod>=2)
 
+    # Create a synthetic time series to match the number of data points.
+    # Doing this instead of relying on the original times, with multi-year
+    # long gaps, greatly speeds processing.
+    t_npc = np.array([])
+
     # Build table using times/dates and observed values from all included
     # events, stored in any of the other tables (but we'll use SWMF for ease.)
     npc_tab = BinaryEventTable(tables['SWMF'].tObs, tables['SWMF'].Obs,
