@@ -170,6 +170,8 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
         mag_set = hilat
     elif 'lo' in mag_set:
         mag_set = lolat
+    elif type(mag_set) is str:
+        mag_set = [mag_set]
 
     # Handle events:
     if event_set == 'all':
