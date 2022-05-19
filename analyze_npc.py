@@ -10,7 +10,7 @@ analysis tools. See that manuscript for details.
 '''
 
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
 import numpy as np
@@ -38,6 +38,13 @@ parser.add_argument("-n", "--n_models", type=int, default=2,
                     help="Set the number of models that must cross the dB/dt "+
                     "threshold in order for the NPC prediction to be counted " +
                     "as a 'hit'. Defaults to 2.")
+parser.add_argument("-m", "--mags", nargs='+', type=str,
+                    default=['all', 'hi', 'lo'],
+                    help="Set which group of magnetometers to use. Can be a " +
+                    "list of 3-letter magnetometer station name codes or a " +
+                    "string indicating what group to use, e.g., 'hi', 'lo', " +
+                    "'all' for high latitude, mid-latitude, or both. " +
+                    "e.g., --mags all hi low pbq")
 
 # Process arguments:
 args = parser.parse_args()
@@ -59,6 +66,7 @@ print(f"Creating NPC analysis using following parameters:")
 print(f"\tEvents = {args.events}")
 print(f"\tThreshold = {args.threshold:0.2f}")
 print(f"\tNumber of members required for NPC threshold crossing: {args.n_models}")
+print(f"\tMagnetometer sets used: {args.mags}")
 print(f'\tOutput directory (ignored in debug mode):')
 print(f"\t\t{fulldir}")
 
@@ -68,11 +76,11 @@ if not os.path.exists(outdir):
 
 # Create time range for all included events:
 tstart = min([mmt.tlims[ev][0] for ev in args.events])
-tstop = max([mmt.tlims[ev][0] for ev in args.events])
+tstop = max([mmt.tlims[ev][-1] for ev in args.events])
 
 ####### Create top-level binary event tables and NPC #######
 # Loop over the key mag groupings: all, hi, lo
-for group in ['all', 'hi', 'lo']:
+for group in args.mags:
     # Turn our script options into function arguments:
     tab_kwargs = {'event_set':args.events, 'mag_set':group,
                   'thresh':args.threshold, 'verbose':False}
@@ -84,6 +92,7 @@ for group in ['all', 'hi', 'lo']:
 
     # Create NPC by counting the number of crossings in each bin
     # across all ensemble members (i.e., models)
+    npc_size, obs_size = tables['SWMF'].obsmax.size, tables['SWMF'].Obs.size
     mod = np.zeros(tables['SWMF'].obsmax.size)
     for tab in tables:
         mod += 1*tables[tab].bool
@@ -92,11 +101,15 @@ for group in ['all', 'hi', 'lo']:
     # Create a synthetic time series to match the number of data points.
     # Doing this instead of relying on the original times, with multi-year
     # long gaps, greatly speeds processing.
-    t_npc = np.array([])
+    tstart = datetime(2000,1,1,0,0,0)
+    t_npc = [tstart + timedelta(minutes=i*20 + 10) for i in range(npc_size)]
+    t_npc = np.array(t_npc)
 
     # Build table using times/dates and observed values from all included
     # events, stored in any of the other tables (but we'll use SWMF for ease.)
-    npc_tab = BinaryEventTable(tables['SWMF'].tObs, tables['SWMF'].Obs,
-                               tables['SWMF'].time, npc_forecast,
+    #npc_tab = BinaryEventTable(tables['SWMF'].tObs, tables['SWMF'].Obs,
+    #                           tables['SWMF'].time, npc_forecast,
+    npc_tab = BinaryEventTable(t_npc, tables['SWMF'].obsmax,
+                               t_npc, npc_forecast,
                                args.threshold, trange=[tstart, tstop],
                                window=20*60, verbose=False)
