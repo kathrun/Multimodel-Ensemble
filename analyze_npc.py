@@ -44,7 +44,8 @@ parser.add_argument("-m", "--mags", nargs='+', type=str,
                     "list of 3-letter magnetometer station name codes or a " +
                     "string indicating what group to use, e.g., 'hi', 'lo', " +
                     "'all' for high latitude, mid-latitude, or both. " +
-                    "e.g., --mags all hi low pbq")
+                    "e.g., --mags all hi low pbq, would run 'hi' and 'low' " +
+                    "magnetometers and the PBQ station by itself.")
 
 # Process arguments:
 args = parser.parse_args()
@@ -71,12 +72,8 @@ print(f'\tOutput directory (ignored in debug mode):')
 print(f"\t\t{fulldir}")
 
 # Create directory if it doesn't exist:
-if not os.path.exists(outdir):
+if not os.path.exists(outdir) and not(args.debug):
     os.mkdir(outdir)
-
-# Create time range for all included events:
-tstart = min([mmt.tlims[ev][0] for ev in args.events])
-tstop = max([mmt.tlims[ev][-1] for ev in args.events])
 
 ####### Create top-level binary event tables and NPC #######
 # Loop over the key mag groupings: all, hi, lo
@@ -111,5 +108,4 @@ for group in args.mags:
     #                           tables['SWMF'].time, npc_forecast,
     npc_tab = BinaryEventTable(t_npc, tables['SWMF'].obsmax,
                                t_npc, npc_forecast,
-                               args.threshold, trange=[tstart, tstop],
-                               window=20*60, verbose=False)
+                               args.threshold, window=20*60, verbose=False)
