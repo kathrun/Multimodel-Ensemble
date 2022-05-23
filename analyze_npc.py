@@ -9,7 +9,7 @@ Analysis builds on Pulkkinen et al., 2013: 6 stations, 6 events, binary event
 analysis tools. See that manuscript for details.
 '''
 
-import os
+import os, sys
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
@@ -62,18 +62,24 @@ for i in args.events:
 fulldir = f"npc_e{ev_str}_t{t_str}_n{args.n_models}_{now:%Y%m%dT%H%M}/"
 outdir = 'npc_debug/' if args.debug else fulldir
 
-# Print info to screen:
-print(f"Creating NPC analysis using following parameters:")
-print(f"\tEvents = {args.events}")
-print(f"\tThreshold = {args.threshold:0.2f}")
-print(f"\tNumber of members required for NPC threshold crossing: {args.n_models}")
-print(f"\tMagnetometer sets used: {args.mags}")
-print(f'\tOutput directory (ignored in debug mode):')
-print(f"\t\t{fulldir}")
-
 # Create directory if it doesn't exist:
 if not os.path.exists(outdir) and not(args.debug):
     os.mkdir(outdir)
+
+# Create ascii output file, switch to stdout if in debug mode:
+if args.debug:
+    outfile = sys.stdout
+else:
+    outfile = open(outdir+'metrics.txt', 'w')
+
+# Print info to screen/file:
+outfile.write(f"Creating NPC analysis using following parameters:\n")
+outfile.write(f"\tEvents = {args.events}\n")
+outfile.write(f"\tThreshold = {args.threshold:0.2f}\n")
+outfile.write(f"\tNumber of members required for NPC threshold crossing: {args.n_models}\n")
+outfile.write(f"\tMagnetometer sets used: {args.mags}\n")
+outfile.write(f'\tOutput directory (ignored in debug mode):\n')
+outfile.write(f"\t\t{fulldir}\n")
 
 ####### Create top-level binary event tables and NPC #######
 # Loop over the key mag groupings: all, hi, lo
@@ -86,6 +92,9 @@ for group in args.mags:
     tables = {}
     for m in mmt.models:
         tables[mmt.models[m]] = mmt.build_table(m, **tab_kwargs)
+
+    # Convenience variable for printing our reference forecast:
+    det = tables["SWMF"]
 
     # Create NPC by counting the number of crossings in each bin
     # across all ensemble members (i.e., models)
@@ -106,6 +115,24 @@ for group in args.mags:
     # events, stored in any of the other tables (but we'll use SWMF for ease.)
     #npc_tab = BinaryEventTable(tables['SWMF'].tObs, tables['SWMF'].Obs,
     #                           tables['SWMF'].time, npc_forecast,
-    npc_tab = BinaryEventTable(t_npc, tables['SWMF'].obsmax,
-                               t_npc, npc_forecast,
-                               args.threshold, window=20*60, verbose=False)
+    npc = BinaryEventTable(t_npc, tables['SWMF'].obsmax,
+                           t_npc, npc_forecast, args.threshold, window=20*60,
+                           verbose=False)
+
+    # Compare the deterministic and ensemble forecast; write results to file.
+    outfile.write(40*'='+'\n')
+    outfile.write(f"Mag group = {group}\n\n")
+
+    outfile.write('Metric | Determ | Ensemb | Diff \n')
+    outfile.write('----------------------------------\n')
+    outfile.write(f"  PoD  | {det.calc_HR():+6.3f} | {npc.calc_HR():+6.3f} |" +
+                  f" {npc.calc_HR() - det.calc_HR():+6.3f}\n")
+    outfile.write(f"  PoFD | {det.calc_FARate():+6.3f} | {npc.calc_FARate():+6.3f} |" +
+                  f" {npc.calc_FARate() - det.calc_FARate():+6.3f}\n")
+    outfile.write(f"  HSS  | {det.calc_heidke():+6.3f} | {npc.calc_heidke():+6.3f} |" +
+                  f" {npc.calc_heidke() - det.calc_heidke():+6.3f}\n")
+    outfile.write(f"  Bias | {det.calc_bias():+6.3f} | {npc.calc_bias():+6.3f} |" +
+                  f" {npc.calc_bias() - det.calc_bias():+6.3f}\n\n")
+# Close our ascii output file
+if not args.debug:
+    outfile.close()
