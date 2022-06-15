@@ -230,4 +230,3 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
                 print(f'\t{m}')
 
     return table
-
