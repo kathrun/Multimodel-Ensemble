@@ -102,7 +102,8 @@ for group in args.mags:
     mod = np.zeros(tables['SWMF'].obsmax.size)
     for tab in tables:
         mod += 1*tables[tab].bool
-    npc_forecast = 1.1 * args.threshold * (mod>=2)
+    # A forecasted event is one where nModels >=2 OR the SWMF detects an event.
+    npc_forecast = 1.1 * args.threshold * ((mod>=2)|tables['SWMF'].bool)
 
     # Create a synthetic time series to match the number of data points.
     # Doing this instead of relying on the original times, with multi-year
