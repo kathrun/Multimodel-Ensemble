@@ -114,7 +114,7 @@ def read_ccmcfile(filename):
 
 
 def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
-                window=20, debug=False, verbose=True):
+                window=20, debug=False, verbose=True, modthresh=None):
     '''
     Create a binary event table for *model* (must be member of *models* list)
     that includes all magnetometers included in *mag_set* (can be "all", "hi",
@@ -142,6 +142,10 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
     thresh : float, default=0.3
         Set the event threshold value; defaults to 0.3.
 
+    modthresh : float
+        Set the threshold for the model to be different then the observation.
+        This is for experimental purposes only.
+
     window : int, default=20
         Set the interval window in minutes; defaults to 20.
 
@@ -165,6 +169,9 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
     '''
 
     from validator import BinaryEventTable
+
+    if not modthresh:
+        modthresh = thresh
 
     # Handle mag set:
     if mag_set == 'all':
@@ -220,11 +227,13 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
             if 'table' not in locals():
                 table = BinaryEventTable(obs['time'], obs['dbh'],
                                          mod['time'], mod['dbh'],
-                                         thresh, window, trange=tlims[ev])
+                                         thresh, window, trange=tlims[ev],
+                                         modelcutoff=modthresh)
             else:
                 table += BinaryEventTable(obs['time'], obs['dbh'],
                                           mod['time'], mod['dbh'],
-                                          thresh, window, trange=tlims[ev])
+                                          thresh, window, trange=tlims[ev],
+                                          modelcutoff=modthresh)
 
         # Print off mags used in comparison
         if debug:
