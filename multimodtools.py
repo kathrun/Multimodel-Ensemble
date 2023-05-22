@@ -18,34 +18,35 @@ install_dir = '/'.join(__loader__.path.split('/')[:-1])+'/'
 datadir = install_dir+'data/'
 
 # Critical constants for handling SWPC events/models/stations etc.
-models = {'2_LFM-MIX':'LFM-MIX',
-          '3_WEIGEL':'Weigel',
-          '4_OPENGGCM':'OpenGGCM',
-          '6_WEIMER':'Weimer2010',
-          '9_SWMF':'SWMF'}
+models = {'2_LFM-MIX': 'LFM-MIX',
+          '3_WEIGEL': 'Weigel',
+          '4_OPENGGCM': 'OpenGGCM',
+          '6_WEIMER': 'Weimer2010',
+          '9_SWMF': 'SWMF'}
 
-hilat = ['PBQ', 'SNK', 'ABK', 'YKC'] #'HRN', 'IQA', 'MEA']
-lolat = ['WNG', 'NEW', 'OTT'] #'FUR', 'FRD', 'FRN']
+hilat = ['PBQ', 'SNK', 'ABK', 'YKC']  # 'HRN', 'IQA', 'MEA']
+lolat = ['WNG', 'NEW', 'OTT']  # 'FUR', 'FRD', 'FRN']
 
 allmag = hilat+lolat
 
 # Time limits of the events:
-tlims={1:(par('October 29th, 2003 06:00UT', ignoretz=True),
-          par('October 30th, 2003 06:00UT', ignoretz=True)),
-       2:(par('December 14, 2006 12:00 UT', ignoretz=True),
-          par('December 16, 2006 00:00 UT', ignoretz=True)),
-       3:(par('August 31, 2001 00:00 UT',   ignoretz=True),
-          par('September 1, 2001 00:00 UT', ignoretz=True)),
-       4:(par('August 31, 2005 10:00 UT',   ignoretz=True),
-          par('September 1, 2005 12:00 UT', ignoretz=True)),
-       7:(par('April 5, 2010 00:00 UT',     ignoretz=True),
-          par('April 6, 2010, 00:00 UT',    ignoretz=True)),
-       8:(par('August 5, 2011 09:00 UT',    ignoretz=True),
-          par('August 6, 2011, 09:00 UT',   ignoretz=True))}
+tlims = {1: (par('October 29th, 2003 06:00UT', ignoretz=True),
+             par('October 30th, 2003 06:00UT', ignoretz=True)),
+         2: (par('December 14, 2006 12:00 UT', ignoretz=True),
+             par('December 16, 2006 00:00 UT', ignoretz=True)),
+         3: (par('August 31, 2001 00:00 UT',   ignoretz=True),
+             par('September 1, 2001 00:00 UT', ignoretz=True)),
+         4: (par('August 31, 2005 10:00 UT',   ignoretz=True),
+             par('September 1, 2005 12:00 UT', ignoretz=True)),
+         7: (par('April 5, 2010 00:00 UT',     ignoretz=True),
+             par('April 6, 2010, 00:00 UT',    ignoretz=True)),
+         8: (par('August 5, 2011 09:00 UT',    ignoretz=True),
+             par('August 6, 2011, 09:00 UT',   ignoretz=True))}
 
 # Store binary event threshold values:
-thres_dt = [0.3, 0.7, 1.1, 1.5] # nT/s
-thres_db = [101.6, 213.6, 317.5, 416.7] #nT
+thres_dt = [0.3, 0.7, 1.1, 1.5]  # nT/s
+thres_db = [101.6, 213.6, 317.5, 416.7]  # nT
+
 
 def read_ccmcfile(filename):
     '''
@@ -84,7 +85,7 @@ def read_ccmcfile(filename):
     data['time'] = np.zeros(nlines, dtype=object)
 
     # All others get set based on type of data in file:
-    for v in ['bn','be','bz']:
+    for v in ['bn', 'be', 'bz']:
         data['d'*is_dBdt + v] = np.zeros(nlines)
 
     # CCMC introduced lots of error in the "second" column of the time
@@ -101,7 +102,7 @@ def read_ccmcfile(filename):
         data['time'][i] = dt.datetime.strptime(t, '%Y %m %d %H %M %S')
 
         # Parse remaining values:
-        for v, x in zip(['bn','be','bz'], parts[-3:]):
+        for v, x in zip(['bn', 'be', 'bz'], parts[-3:]):
             data['d'*is_dBdt + v][i] = x
 
     # Calculate h component:
@@ -111,18 +112,20 @@ def read_ccmcfile(filename):
     # Return data object to caller:
     return data
 
+
 def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
                 window=20, debug=False, verbose=True):
     '''
     Create a binary event table for *model* (must be member of *models* list)
     that includes all magnetometers included in *mag_set* (can be "all", "hi",
-    or "lo") for all events listed in *event_set* and using a certain threshold,
-    *thresh*.
+    or "lo") for all events listed in *event_set* and using a certain
+    threshold, *thresh*.
 
     Parameters
     ==========
     model:str
-       What model to use when building the table.  See *models* list for options.
+       What model to use when building the table.  See *models* list for
+       options.
 
     Other Parameters
     ================
@@ -164,7 +167,7 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
     from validator import BinaryEventTable
 
     # Handle mag set:
-    if mag_set=='all':
+    if mag_set == 'all':
         mag_set = allmag
     elif 'hi' in mag_set:
         mag_set = hilat
@@ -175,7 +178,7 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
 
     # Handle events:
     if event_set == 'all':
-        event_set=[1,2,3,4,7,8]
+        event_set = [1, 2, 3, 4, 7, 8]
     elif type(event_set) == int:
         event_set = [event_set]
 
@@ -192,11 +195,11 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
 
         for mag in mag_set:
             # Build path to model data
-            f_mod=datadir + f'/dBdt/Event{ev}/{model}/{mag.upper()}' + \
+            f_mod = datadir + f'/dBdt/Event{ev}/{model}/{mag.upper()}' + \
                 f'_{model}_Event{ev}.txt'
 
             # Build path to obs data
-            f_obs=datadir+f'/dBdt/Event{ev}/Observations/{mag.lower()}' \
+            f_obs = datadir+f'/dBdt/Event{ev}/Observations/{mag.lower()}' \
                 + f'_OBS_{tlims[ev][0]:%Y%m%d}.txt'
 
             if debug:
@@ -214,14 +217,14 @@ def build_table(model,  event_set='all', mag_set='all', thresh=0.3,
             obs = read_ccmcfile(f_obs)
 
             # Compute table, add to existing hits/misses/etc.
-            if 'table' in locals():
-                table += BinaryEventTable(obs['time'], obs['dbh'],
-                                          mod['time'], mod['dbh'],
-                                          thresh, window, trange=tlims[ev])
-            else:
+            if 'table' not in locals():
                 table = BinaryEventTable(obs['time'], obs['dbh'],
                                          mod['time'], mod['dbh'],
                                          thresh, window, trange=tlims[ev])
+            else:
+                table += BinaryEventTable(obs['time'], obs['dbh'],
+                                          mod['time'], mod['dbh'],
+                                          thresh, window, trange=tlims[ev])
 
         # Print off mags used in comparison
         if debug:
