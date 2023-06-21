@@ -12,7 +12,10 @@ import numpy as np
 from dateutil.parser import parse as par
 
 # Get install directory:
-install_dir = '/'.join(__loader__.path.split('/')[:-1])+'/'
+if __name__ != '__main__':
+    install_dir = '/'.join(__loader__.path.split('/')[:-1])+'/'
+else:
+    install_dir = ''
 
 # Get path to data directory:
 datadir = install_dir+'data/'
@@ -23,9 +26,18 @@ models = {'2_LFM-MIX': 'LFM-MIX',
           '4_OPENGGCM': 'OpenGGCM',
           '6_WEIMER': 'Weimer2010',
           '9_SWMF': 'SWMF'}
+# Sorted model names:
+modnames = list(models.keys())
+modnames.sort()
 
 hilat = ['PBQ', 'SNK', 'ABK', 'YKC']  # 'HRN', 'IQA', 'MEA']
 lolat = ['WNG', 'NEW', 'OTT']  # 'FUR', 'FRD', 'FRN']
+
+# Colors for plotting:
+cols = {}
+colnames = ['gold', 'firebrick', 'darkorange', 'olivedrab', 'royalblue']
+for m, c in zip(modnames, colnames):
+    cols[m] = c
 
 allmag = hilat+lolat
 
