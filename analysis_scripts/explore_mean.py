@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
 '''
-This script...
+This script creates a mean forecast by averaging the max db_h/dt values in a
+twenty minutes time intervalfrom the five models used in Pulkkinen et al. 2013.
 '''
 
 import numpy as np
 import multimodtools as mmt
 import matplotlib.pyplot as plt
-
-from validator import BinaryEventTable
 
 from argparse import ArgumentParser
 
@@ -63,8 +62,10 @@ a1.legend(loc='upper right', edgecolor='white', framealpha=1)
 
 # Second plot:
 a2.plot(plottime, modmean, '-o', c='black', label='Ensemble Mean')
-a2.plot(plottime, t['9_SWMF'].modmax, '-*', c='royalblue', label='SWMF', alpha=0.85)
-a2.plot(plottime, t['9_SWMF'].obsmax, '-X', c='crimson', label='Observations', alpha=0.85)
+a2.plot(plottime, t['9_SWMF'].modmax, '-*', c='royalblue', label='SWMF',
+        alpha=0.85)
+a2.plot(plottime, t['9_SWMF'].obsmax, '-X', c='crimson', label='Observations',
+        alpha=0.85)
 
 a2.set_title('Ensemble Mean vs Determinsitc')
 a2.set_ylabel('dB/dt')

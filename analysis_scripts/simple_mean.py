@@ -1,4 +1,3 @@
-import numpy as np
 import multimodtools as mmt
 import matplotlib.pyplot as plt
 
@@ -10,7 +9,11 @@ t5 = mmt.build_table('9_SWMF', event_set=[2], mag_set='ABK')
 
 modmean = (t1.modmax + t2.modmax + t3.modmax + t4.modmax + t5.modmax)/5
 
-#plotting
+# ploting
 plt.style.use('fivethirtyeight')
-plt.plot(t1.time, modmean, 'o' )
+plt.plot(t1.time, modmean, 'o')
 plt.show()
+
+# Combine arrys to find the median
+stack = np.vstack([t['SWMF'].modmax, t['LFM-MIX'].modmax, t['OpenGGCM'].modmax, t['Weimer2010'].modmax, t['Weigel'].modmax])
+median = np.median(stack, axis=0)
