@@ -31,7 +31,7 @@ for m in mmt.models:
     # Loop over all thresholds.
     for i, dthresh in enumerate(tScaled):
         # Create the table for the given threshold:
-        table = mmt.build_table(m, thresh=thresh - dthresh)
+        table = mmt.build_table(m, thresh=thresh, modthresh=thresh-dthresh)
 
         # Calculate and stash the associated metrics:
         heidke[i] = table.calc_heidke()
