@@ -68,13 +68,14 @@ fig.suptitle('Forecast vs. Model Threshold')
 fig.subplots_adjust(top=0.949, bottom=0.167, left=0.107,
                     right=0.972, hspace=0.26, wspace=0.286)
 
+
 # For finding max threshold
 for m in mmt.models:
     y_h = results[m]['heidke'].argmax()
-    print(m, "heidke Max:", threshes.take(y_h))
+    print(m, "heidke Max:", threshes[y_h])
     y_b = results[m]['bias'].argmax()
-    print(m, "Bias Max:", threshes.take(y_b))
+    print(m, "Bias Max:", threshes[y_b])
     y_p = results[m]['pod'].argmax()
-    print(m, "PoD Max:", threshes.take(y_p))
+    print(m, "PoD Max:", threshes[y_p])
     y_f = results[m]['pofd'].argmax()
-    print(m, "PoFD Max:", threshes.take(y_f), "\n\n")
+    print(m, "PoFD Max:", threshes[y_f], "\n\n")
