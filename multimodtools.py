@@ -25,8 +25,7 @@ models = {'2_LFM-MIX': 'LFM-MIX',
           '3_WEIGEL': 'Weigel',
           '4_OPENGGCM': 'OpenGGCM',
           '6_WEIMER': 'Weimer2010',
-          '9_SWMF': 'SWMF',
-          'Mean': 'Mean'}
+          '9_SWMF': 'SWMF'}
 # Sorted model names:
 modnames = list(models.keys())
 modnames.sort()
