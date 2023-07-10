@@ -66,19 +66,19 @@ outfile.write("# model: Mean\n")
 outfile.write("# Shielding angle [deg.]:      -90.0000\n")
 outfile.write("# North, East and vertical components of magnetic field\n")
 outfile.write(f"# Station: {args.mag}\n")
-outfile.write("#Position (GEO): lon=       18.240 lat=      68.3560\n")
+outfile.write("#Position (GEO): lon=       245.518 lat=      62.4830\n")
 # Hard code or utilize argparse
-outfile.write("Year Month Day Hour Min Sec GeomagLat GeomagLon dBdt_Horizontal\n")
-outfile.write("[year] [month] [day] [hour] [min] [s] [deg] [deg] [nT/s] [nT/s] [nT/s]\n")
+outfile.write("Year Month Day Hour Min Sec GeomagLat GeomagLon dBdt_Horizonatl\n")
+outfile.write("[year] [month] [day] [hour] [min] [s] [deg] [deg] [nT/s]\n\n")
 
 # Trying to fill array properly formated
 # This took me way longer to figre out than it should have 
 # Datetime: ?????? 
 # Only have db_h not each component...
 for t, db in zip(plottime, modmean): 
-    outfile.write('{0}     {1}     {2}     {3}     {4}     {5}\n'
-                  .format(t.strftime('%Y %m %d %H %M %S'),
-                  '65.1120', '102.300','{:.5f}'.format(db), '0.00', '0.00'))
+    outfile.write('{0}     {1}     {2}     {3}\n'
+                  .format(t.strftime('%Y %m %d %H %M %S'), 69.7140, 299.3950,
+                          '{:.5f}'.format(db)))
 
 if not args.debug:
     outfile.close()
