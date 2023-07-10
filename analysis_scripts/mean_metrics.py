@@ -10,7 +10,8 @@ import multimodtools as mmt
 
 # Argparser lines in order to change the event, station, and model
 parser = ArgumentParser(description=__doc__)
-parser.add_argument("-e", "--event", type=int, default=1,
+parser.add_argument("-e", "--events", type=int, nargs='+',
+                    default=[1],
                     help="Set the events to analyze via list of event number,"
                     + "e.g., --events 1 2 7 8")
 parser.add_argument("-m", "--mag", type=str, default='YKC',
@@ -25,12 +26,12 @@ parser.add_argument("-d", "--debug", action="store_true",
 args = parser.parse_args()
 
 # script options into function arguments?
-tab_kwargs = {'event_set': args.event, 'mag_set': args.mag, 'thresh': args.thresh}
+tab_kwargs = {'event_set': args.events, 'mag_set': args.mag, 'thresh': args.thresh}
 
 swmf = mmt.build_table('9_SWMF', **tab_kwargs)
 mean_tab = mmt.build_table('Mean', **tab_kwargs)
 
-print(f'Station: {args.mag}\tEvent: {args.event}\tThreshold: {args.thresh}')
+print(f'Station: {args.mag}\tEvent(s): {args.events}\tThreshold: {args.thresh}')
 print('Metric | Determ | Ensemb | Diff \n')
 print('----------------------------------\n')
 print(f"  PoD  | {swmf.calc_HR():+6.3f} | {mean_tab.calc_HR():+6.3f} |" +
