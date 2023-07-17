@@ -73,9 +73,13 @@ fig.subplots_adjust(top=0.949, bottom=0.167, left=0.107,
 for m in mmt.models:
     y_h = results[m]['heidke'].argmax()
     print(m, "heidke Max:", threshes[y_h])
-    y_b = results[m]['bias'].argmax()
-    print(m, "Bias Max:", threshes[y_b])
     y_p = results[m]['pod'].argmax()
     print(m, "PoD Max:", threshes[y_p])
     y_f = results[m]['pofd'].argmax()
-    print(m, "PoFD Max:", threshes[y_f], "\n\n")
+    print(m, "PoFD Max:", threshes[y_f], "\n")
+
+#Calculating optimized bias
+for m in mmt.models:
+        b_dist =  abs(1-(results[m]['bias']))
+        b_loc= b_dist.argmin()
+        print(m,"Optimized Bias:", threshes[b_loc])
