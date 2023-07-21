@@ -117,6 +117,10 @@ def read_ccmcfile(filename):
         for v, x in zip(['bn', 'be', 'bz'], parts[-3:]):
             data['d'*is_dBdt + v][i] = x
 
+    # Mask NaNs:
+    for v in ['bn', 'be', 'bz']:
+        data['d'*is_dBdt + v] = np.ma.masked_invalid(data['d'*is_dBdt + v])
+
     # Calculate h component:
     data['d'*is_dBdt + 'bh'] = np.sqrt(data['d'*is_dBdt + 'bn']**2 +
                                        data['d'*is_dBdt + 'be']**2)
