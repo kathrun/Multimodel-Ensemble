@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-Analyze a multi-model Naive Probabilistic Classifier ensemble forecast for
-dB/dt. When called, a new folder will be created that contains the output
-files, plots, and results.
+Work in progross in creating a NPC based on scaled threshold.
 
 Analysis builds on Pulkkinen et al., 2013: 6 stations, 6 events, binary event
 analysis tools. See that manuscript for details.
@@ -34,6 +32,9 @@ parser.add_argument("-t", "--threshold", type=float, default=0.3,
                     help="Set the threshold for dB/dt in the binary event" +
                     "analysis. Default is 0.3, standard values are " +
                     "0.3, 0.7, 1.1, and 1.5 nT/s.")
+parser.add_argument("-mt", "--modthresh", type=float, default=0.205,
+                    help="Set the threshold for dB/dt in the binary event" +
+                    "analysis. Default is 0.205")
 parser.add_argument("-n", "--n_models", type=int, default=2,
                     help="Set the number of models that must cross the dB/dt "+
                     "threshold in order for the NPC prediction to be counted " +
@@ -85,24 +86,27 @@ outfile.write(f"\t\t{fulldir}\n")
 # Loop over the key mag groupings: all, hi, lo
 for group in args.mags:
     # Turn our script options into function arguments:
-    tab_kwargs = {'event_set':args.events, 'mag_set':group,
-                  'thresh':args.threshold, 'verbose':False}
+    tab_kwargs = {'event_set': args.events, 'mag_set': group,
+                  'modthresh': args.modthresh, 'verbose': False}
 
     # Create tables for all 5 models:
     tables = {}
     for m in mmt.models:
         tables[mmt.models[m]] = mmt.build_table(m, **tab_kwargs)
 
-    # Convenience variable for printing our reference forecast:
-    det = tables["SWMF"]
+    # Variables!!!
+    # For Deterministic, nonmodified, forecast
+    det = mmt.build_table("9_SWMF", args.events, group, args.threshold)
+    # For sizing
+    SWMF = tables[mmt.models['9_SWMF']]
 
     # Create NPC by counting the number of crossings in each bin
     # across all ensemble members (i.e., models)
-    npc_size, obs_size = tables['SWMF'].obsmax.size, tables['SWMF'].Obs.size
-    mod = np.zeros(tables['SWMF'].obsmax.size)
+    npc_size, obs_size = SWMF.obsmax.size, SWMF.Obs.size
+    mod = np.zeros(SWMF.obsmax.size)
     for tab in tables:
         mod += 1*tables[tab].bool
-    npc_forecast = 1.1 * args.threshold * (mod>=2)
+    npc_forecast = 1.1 * args.threshold * (mod >= 2)
 
     # Create a synthetic time series to match the number of data points.
     # Doing this instead of relying on the original times, with multi-year
@@ -114,14 +118,12 @@ for group in args.mags:
     # Build table using times/dates and observed values from all included
     # events, stored in any of the other tables (but we'll use SWMF for ease.)
 
-    npc = BinaryEventTable(t_npc, tables['SWMF'].obsmax,
-                           t_npc, npc_forecast, args.threshold, window=20*60,
-                           verbose=False)
+    npc = BinaryEventTable(t_npc, SWMF.obsmax, t_npc, npc_forecast,
+                           args.modthresh, window=20*60, verbose=False)
 
     # Compare the deterministic and ensemble forecast; write results to file.
     outfile.write(40*'='+'\n')
     outfile.write(f"Mag group = {group}\n\n")
-
     outfile.write('Metric | Determ | Ensemb | Diff \n')
     outfile.write('----------------------------------\n')
     outfile.write(f"  PoD  | {det.calc_HR():+6.3f} | {npc.calc_HR():+6.3f} |" +
