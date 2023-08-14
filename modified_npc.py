@@ -2,6 +2,8 @@
 '''
 Testing a modified threshold NPC. If working as intended create a script
 to handle all events and mags.
+
+Needs to loops through modthresh for each model.
 '''
 
 import numpy as np

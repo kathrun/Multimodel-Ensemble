@@ -21,8 +21,8 @@ import multimodtools as mmt
 # Argparser lines in order to change the event, station, and model
 parser = ArgumentParser(description=__doc__)
 parser.add_argument("-e", "--event", type=int, default=1,
-                    help="Set the events to analyze via list of event number,"
-                    + "e.g., --events 1 2 7 8")
+                    help="Set the event to analyze via list of event number,"
+                    + "e.g., --event  2")
 parser.add_argument("-m", "--mag", type=str, default='YKC',
                     help='Set the magnetometer to analyze: ABK, PBQ, ' +
                     'SNK, YKC, NEW, OTT, or WNG')
