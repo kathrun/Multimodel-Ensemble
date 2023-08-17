@@ -2,18 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.ticker as ticker
-from cycler import cycler
+from spacepy.plot import style 
 
-plt.style.use('ggplot')
+style()
 
 # set style information
-# create own style?
-plt.style.use('seaborn-notebook')
-mpl.rcParams['lines.linewidth'] = 3
-mpl.rcParams["figure.titlesize"] = 20
-mpl.rcParams['axes.labelsize'] = 16
-mpl.rcParams['xtick.labelsize'] = 12
-mpl.rcParams['ytick.labelsize'] = 12
+mpl.rcParams['lines.linewidth'] = 2.5
+#mpl.rcParams['axes.labelsize'] = 16
+#mpl.rcParams['xtick.labelsize'] = 12
+#mpl.rcParams['ytick.labelsize'] = 12
 
 npc = [1, 2, 3, 4, 5]
 
