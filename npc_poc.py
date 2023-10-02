@@ -16,7 +16,7 @@ import multimodtools as mmt
 style()
 
 # Set metric parameters:
-mag, event, thresh, modthresh = 'WNG', 4, 0.3
+mag, event, thresh = 'WNG', 4, 0.3
 tab_kwargs = {'event_set':[event], 'mag_set':[mag], 'thresh':thresh}
 
 # Create tables for all 5 models.
